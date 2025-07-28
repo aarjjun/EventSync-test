@@ -53,8 +53,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error);
+        setUser(null);
+        setProfile(null);
+      } finally {
+        setLoading(false); // <-- Always set loading to false
       }
-      setLoading(false); // <-- Always set loading to false after session check
     };
 
     getInitialSession();
@@ -73,7 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
           setProfile(null);
         }
-        setLoading(false); // <-- Always set loading to false after auth change
+        setLoading(false); // <-- Ensure loading is set to false after auth change
       }
     );
 
