@@ -51,10 +51,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (data?.session?.user) {
           setUser(data.session.user);
-          await fetchProfile(data.session.user.id);
+          fetchProfile(data.session.user.id).finally(() => {
+            setLoading(false);
+          });
         } else {
           setUser(null);
           setProfile(null);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error);
@@ -65,8 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
         setUser(null);
         setProfile(null);
-      } finally {
-        setLoading(false); // <-- Always set loading to false
+        setLoading(false);
       }
     };
 
@@ -80,12 +82,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
           if (session?.user) {
             setUser(session.user);
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-              await fetchProfile(session.user.id);
-            }
+            fetchProfile(session.user.id).finally(() => {
+              setLoading(false);
+            });
           } else {
             setUser(null);
             setProfile(null);
+            setLoading(false);
           }
         } catch (error) {
           console.error('Error in auth state change:', error);
@@ -96,8 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
           setUser(null);
           setProfile(null);
-        } finally {
-          setLoading(false); // <-- Ensure loading is set to false after auth change
+          setLoading(false);
         }
       }
     );
