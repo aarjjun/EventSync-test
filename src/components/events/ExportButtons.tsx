@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -316,7 +315,7 @@ export const ExportButtons = ({ events }: ExportButtonsProps) => {
             minute: '2-digit'
           });
           
-          doc.text(`📅 Start: ${startTimeStr}`, margin + 10, yPosition + 22);
+          doc.text(`Event Start Date: ${startTimeStr}`, margin + 10, yPosition + 22);
           
           // Show end date if available
           if (event.end_datetime || event.end_date) {
@@ -327,11 +326,11 @@ export const ExportButtons = ({ events }: ExportButtonsProps) => {
               hour: '2-digit',
               minute: '2-digit'
             });
-            doc.text(`📅 End: ${endTimeStr}`, margin + 10, yPosition + 32);
+            doc.text(`Event End Date: ${endTimeStr}`, margin + 10, yPosition + 32);
           }
           
-          doc.text(`🏢 ${event.community}`, margin + 120, yPosition + 22);
-          doc.text(`📋 ${event.type}`, margin + 120, yPosition + 32);
+          doc.text(`Community: ${event.community}`, margin + 120, yPosition + 22);
+          doc.text(`Event Type: ${event.type}`, margin + 120, yPosition + 32);
           
           yPosition += 55;
         });
