@@ -50,14 +50,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setUser(null);
           setProfile(null);
-          setLoading(false); // <-- Ensure loading is set to false if no session
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error);
-        setLoading(false); // <-- Also set loading to false on error
-      } finally {
-        // Remove setLoading(false) from finally to avoid double-calling
       }
+      setLoading(false); // <-- Always set loading to false after session check
     };
 
     getInitialSession();
@@ -66,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
-        
+
         if (session?.user) {
           setUser(session.user);
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -76,10 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
           setProfile(null);
         }
-        
-        if (event === 'SIGNED_OUT') {
-          setLoading(false);
-        }
+        setLoading(false); // <-- Always set loading to false after auth change
       }
     );
 
