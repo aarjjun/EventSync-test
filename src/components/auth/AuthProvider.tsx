@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -44,15 +43,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error) {
           console.error('Error getting session:', error);
         }
-        
+
         if (session?.user) {
           setUser(session.user);
           await fetchProfile(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
+          setLoading(false); // <-- Ensure loading is set to false if no session
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error);
+        setLoading(false); // <-- Also set loading to false on error
       } finally {
-        setLoading(false);
+        // Remove setLoading(false) from finally to avoid double-calling
       }
     };
 
