@@ -39,20 +39,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error('Error getting session:', error);
+          toast({
+            title: "Auth Error",
+            description: "Unable to connect to authentication service. Please check your network or try again later.",
+            variant: "destructive",
+          });
         }
 
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
+        if (data?.session?.user) {
+          setUser(data.session.user);
+          await fetchProfile(data.session.user.id);
         } else {
           setUser(null);
           setProfile(null);
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error);
+        toast({
+          title: "Network Error",
+          description: "Could not reach authentication server. Please check your connection.",
+          variant: "destructive",
+        });
         setUser(null);
         setProfile(null);
       } finally {
@@ -65,18 +75,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
+        try {
+          console.log('Auth state changed:', event, session?.user?.id);
 
-        if (session?.user) {
-          setUser(session.user);
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            await fetchProfile(session.user.id);
+          if (session?.user) {
+            setUser(session.user);
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+              await fetchProfile(session.user.id);
+            }
+          } else {
+            setUser(null);
+            setProfile(null);
           }
-        } else {
+        } catch (error) {
+          console.error('Error in auth state change:', error);
+          toast({
+            title: "Auth Error",
+            description: "Authentication service error. Please reload or try again.",
+            variant: "destructive",
+          });
           setUser(null);
           setProfile(null);
+        } finally {
+          setLoading(false); // <-- Ensure loading is set to false after auth change
         }
-        setLoading(false); // <-- Ensure loading is set to false after auth change
       }
     );
 
